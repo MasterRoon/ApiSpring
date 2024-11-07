@@ -42,5 +42,16 @@ public class ControlPessoa {
         return ResponseEntity.ok(lista);
     }
 
+    @PutMapping("/{codigoPessoa}")
+    public ResponseEntity<Void> atualizarPessoaCodigo(@PathVariable("codigoPessoa") String codigoPessoa, @RequestBody AtualizarDto atualizarDto){
+        pessoaService.atualizarPessoaId(codigoPessoa, atualizarDto);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/{codigoPessoa}")
+    public ResponseEntity<Void> DeletePessoa(@PathVariable Long codigoPessoa) {
+        pessoaService.DeletePessoaByCodigoPessoa(codigoPessoa);
+        return ResponseEntity.noContent().build();
+    }
 
 }
