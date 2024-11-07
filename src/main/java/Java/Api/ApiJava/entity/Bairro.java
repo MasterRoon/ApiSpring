@@ -13,7 +13,6 @@ import java.util.Set;
 public class Bairro {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "CODIGO_BAIRRO")
     private Long codigoBairro;
 

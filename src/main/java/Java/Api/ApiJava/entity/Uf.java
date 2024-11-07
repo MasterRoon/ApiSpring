@@ -12,7 +12,6 @@ import java.util.Set;
 public class Uf {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "CODIGO_UF")
     private Long codigoUf;
 
