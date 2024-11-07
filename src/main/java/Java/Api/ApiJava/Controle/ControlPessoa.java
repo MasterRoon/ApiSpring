@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.util.List;
 
 @RestController
 @RequestMapping("/pessoas")
@@ -27,8 +28,19 @@ public class ControlPessoa {
 
     @GetMapping("/{codigoPessoa}")
     public ResponseEntity<Pessoa> getPessoaByCodigo(@PathVariable("codigoPessoa") String codigoPessoa){
-        //
-        return null;
+        var pessoa = pessoaService.getPessoaByCodigoPessoa(codigoPessoa);
+        if(pessoa.isPresent()){
+            return ResponseEntity.ok(pessoa.get());
+        }else{
+            return ResponseEntity.notFound().build();
+        }
     }
+
+    @GetMapping
+    public ResponseEntity<List<Pessoa>> getAllPessoas(){
+        var lista = pessoaService.ListarPessoas();
+        return ResponseEntity.ok(lista);
+    }
+
 
 }

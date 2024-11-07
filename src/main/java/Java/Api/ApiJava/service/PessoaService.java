@@ -3,11 +3,14 @@ package Java.Api.ApiJava.service;
 import Java.Api.ApiJava.Controle.CriarPessoaDto;
 import Java.Api.ApiJava.Repositorio.PessoaRepositorio;
 import Java.Api.ApiJava.entity.Pessoa;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 
 import java.time.Instant;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 public class PessoaService {
@@ -23,7 +26,7 @@ public class PessoaService {
                 null,
                 null,
                 Instant.now(),               // creationTimestamp
-                new HashSet<>(),             // enderecos (passando um conjunto vazio, por exemplo) mas ta com problema quando da import
+                new HashSet<>(),             // enderecos (passando um conjunto vazio, por exemplo)
                 1,                           // status (ou outro valor padrão)
                 criarPessoaDto.nome(),       // nome
                 criarPessoaDto.sobrenome(),  // sobrenome
@@ -44,6 +47,14 @@ public class PessoaService {
 
         var UsuarioSavo = pessoaRepositorio.save(entity);
         return UsuarioSavo.getCodigoPessoa();
+    }
+
+    public Optional<Pessoa> getPessoaByCodigoPessoa(String codigoPessoa) {
+        return pessoaRepositorio.findById(Long.valueOf(codigoPessoa));
+    }
+
+    public List<Pessoa> ListarPessoas() {
+        return pessoaRepositorio.findAll();
     }
 
 }
