@@ -58,7 +58,7 @@ public class ControlPessoa {
     }
 
     @PostMapping("/{codigoPessoa}/enderecos")
-    public ResponseEntity<Void> DeletePessoa(@PathVariable Long codigoPessoa, @RequestBody CadrastroEndereco cadrastroEndereco) {
+    public ResponseEntity<Void> cadrastroEndereco(@PathVariable String codigoPessoa, @RequestBody CadrastroEndereco cadrastroEndereco) {
         pessoaService.cadastroEndereco(codigoPessoa, cadrastroEndereco);
         return ResponseEntity.ok().build();
     }

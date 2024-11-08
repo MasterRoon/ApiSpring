@@ -3,11 +3,16 @@ package Java.Api.ApiJava.service;
 import Java.Api.ApiJava.Controle.Dto.AtualizarDto;
 import Java.Api.ApiJava.Controle.Dto.CadrastroEndereco;
 import Java.Api.ApiJava.Controle.Dto.CriarPessoaDto;
+import Java.Api.ApiJava.Repositorio.EnderecoRepositorio;
 import Java.Api.ApiJava.Repositorio.PessoaRepositorio;
+import Java.Api.ApiJava.entity.Bairro;
+import Java.Api.ApiJava.entity.Endereco;
 import Java.Api.ApiJava.entity.Pessoa;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 
 import java.time.Instant;
@@ -19,9 +24,12 @@ import java.util.Optional;
 public class PessoaService {
 
     private PessoaRepositorio pessoaRepositorio;
+    
+    private EnderecoRepositorio enderecoRepositorio;
 
-    public PessoaService(PessoaRepositorio pessoaRepositorio) {
+    public PessoaService(PessoaRepositorio pessoaRepositorio, EnderecoRepositorio enderecoRepositorio) {
         this.pessoaRepositorio = pessoaRepositorio;
+        this.enderecoRepositorio = enderecoRepositorio;
     }
 
     public long createPessoa(CriarPessoaDto criarPessoaDto) {
@@ -95,6 +103,22 @@ public class PessoaService {
     }
 
 
-    public void cadastroEndereco(Long codigoPessoa, CadrastroEndereco cadrastroEndereco) {
+    public void cadastroEndereco(String codigoPessoa, CadrastroEndereco cadrastroEndereco) {
+        
+        var pessoa = pessoaRepositorio.findById(Long.parseLong(codigoPessoa))
+                .orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+        var endereco = new Endereco(
+                cadrastroEndereco.codigoEndereco(),
+                null,
+                Instant.now(),
+                cadrastroEndereco.nomeRua(),          // nome da rua
+                cadrastroEndereco.numero(),           // número
+                cadrastroEndereco.complemento(),      // complemento (pode ser opcional)
+                cadrastroEndereco.cep(),            // cep
+                pessoa,
+                Bairro
+            );
+        var enderecoCadrastrado = enderecoRepositorio.save(endereco);
     }
 }
