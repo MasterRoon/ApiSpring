@@ -1,5 +1,7 @@
 package Java.Api.ApiJava.Controle;
 
+import Java.Api.ApiJava.Controle.Dto.AtualizarDto;
+import Java.Api.ApiJava.Controle.Dto.CriarPessoaDto;
 import Java.Api.ApiJava.service.PessoaService;
 import org.springframework.web.bind.annotation.GetMapping;
 import Java.Api.ApiJava.entity.Pessoa;
@@ -53,5 +55,7 @@ public class ControlPessoa {
         pessoaService.DeletePessoaByCodigoPessoa(codigoPessoa);
         return ResponseEntity.noContent().build();
     }
+
+
 
 }
