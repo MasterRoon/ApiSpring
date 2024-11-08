@@ -1,6 +1,7 @@
 package Java.Api.ApiJava.Controle;
 
 import Java.Api.ApiJava.Controle.Dto.AtualizarDto;
+import Java.Api.ApiJava.Controle.Dto.CadrastroEndereco;
 import Java.Api.ApiJava.Controle.Dto.CriarPessoaDto;
 import Java.Api.ApiJava.service.PessoaService;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -56,6 +57,10 @@ public class ControlPessoa {
         return ResponseEntity.noContent().build();
     }
 
-
+    @PostMapping("/{codigoPessoa}/enderecos")
+    public ResponseEntity<Void> DeletePessoa(@PathVariable Long codigoPessoa, @RequestBody CadrastroEndereco cadrastroEndereco) {
+        pessoaService.cadastroEndereco(codigoPessoa, cadrastroEndereco);
+        return ResponseEntity.ok().build();
+    }
 
 }

@@ -1,6 +1,7 @@
 package Java.Api.ApiJava.service;
 
 import Java.Api.ApiJava.Controle.Dto.AtualizarDto;
+import Java.Api.ApiJava.Controle.Dto.CadrastroEndereco;
 import Java.Api.ApiJava.Controle.Dto.CriarPessoaDto;
 import Java.Api.ApiJava.Repositorio.PessoaRepositorio;
 import Java.Api.ApiJava.entity.Pessoa;
@@ -94,5 +95,6 @@ public class PessoaService {
     }
 
 
-
+    public void cadastroEndereco(Long codigoPessoa, CadrastroEndereco cadrastroEndereco) {
+    }
 }
