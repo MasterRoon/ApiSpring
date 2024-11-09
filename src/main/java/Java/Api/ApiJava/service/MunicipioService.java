@@ -81,4 +81,13 @@ public class MunicipioService {
         return municipioRepositorio.findAll(spec);
     }
 
+    public void desativarMunicipio(Long codigoMunicipio) {
+        var municipio = municipioRepositorio.findById(codigoMunicipio)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Município não encontrado"));
+
+        // Atualizar status para 2, indicando desativado
+        municipio.setStatus(2);
+        municipioRepositorio.save(municipio);
+    }
+
 }

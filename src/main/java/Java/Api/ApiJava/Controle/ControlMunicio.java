@@ -46,4 +46,10 @@ public class ControlMunicio {
         return ResponseEntity.ok(municipios);
     }
 
+    @DeleteMapping("/{codigoMunicipio}")
+    public ResponseEntity<Void> desativarMunicipio(@PathVariable Long codigoMunicipio) {
+        municipioService.desativarMunicipio(codigoMunicipio);
+        return ResponseEntity.noContent().build();
+    }
+
 }

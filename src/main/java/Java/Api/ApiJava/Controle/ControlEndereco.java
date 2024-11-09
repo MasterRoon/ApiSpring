@@ -1,14 +1,11 @@
 package Java.Api.ApiJava.Controle;
 
 import Java.Api.ApiJava.Controle.Dto.CadrastroEndereco;
-import Java.Api.ApiJava.Controle.Dto.RespostaEndereco;
 import Java.Api.ApiJava.service.EnderecoService;
 import Java.Api.ApiJava.service.PessoaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/enderecos")
