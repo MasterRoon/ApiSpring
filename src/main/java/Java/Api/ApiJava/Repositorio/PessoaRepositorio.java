@@ -17,7 +17,7 @@ public interface PessoaRepositorio extends JpaRepository<Pessoa, Long> {
 
     List<Pessoa> findByStatus(Integer status);
 
-    // Método personalizado para buscar todas as pessoas sem os endereços
+
     @Query("SELECT p FROM Pessoa p LEFT JOIN FETCH p.enderecos e WHERE e IS NULL")
     List<Pessoa> findAllWithoutEnderecos();
 }
