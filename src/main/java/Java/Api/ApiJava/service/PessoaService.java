@@ -24,13 +24,7 @@ import java.util.Optional;
 public class PessoaService {
 
     private PessoaRepositorio pessoaRepositorio;
-    
-    private EnderecoRepositorio enderecoRepositorio;
 
-    public PessoaService(PessoaRepositorio pessoaRepositorio, EnderecoRepositorio enderecoRepositorio) {
-        this.pessoaRepositorio = pessoaRepositorio;
-        this.enderecoRepositorio = enderecoRepositorio;
-    }
 
     public long createPessoa(CriarPessoaDto criarPessoaDto) {
         var entity = new Pessoa(
@@ -44,15 +38,6 @@ public class PessoaService {
                 criarPessoaDto.idade(),      // idade
                 criarPessoaDto.login(),
                 criarPessoaDto.senha()
-
-                //null,
-                //criarPessoaDto.nome(),       //
-                //criarPessoaDto.sobrenome(),  //
-                //criarPessoaDto.idade(),      //
-                //criarPessoaDto.login(),      //
-                //criarPessoaDto.senha()      // versão antiga mas o null não me deixa resolver de jeito nenhum
-                //Instant.now(),              //
-                //null                        //
 
          );
 
@@ -103,22 +88,4 @@ public class PessoaService {
     }
 
 
-    public void cadastroEndereco(String codigoPessoa, CadrastroEndereco cadrastroEndereco) {
-        
-        var pessoa = pessoaRepositorio.findById(Long.parseLong(codigoPessoa))
-                .orElseThrow(()-> new ResponseStatusException(HttpStatus.NOT_FOUND));
-
-        var endereco = new Endereco(
-                cadrastroEndereco.codigoEndereco(),
-                null,
-                Instant.now(),
-                cadrastroEndereco.nomeRua(),          // nome da rua
-                cadrastroEndereco.numero(),           // número
-                cadrastroEndereco.complemento(),      // complemento (pode ser opcional)
-                cadrastroEndereco.cep(),            // cep
-                pessoa,
-                Bairro
-            );
-        var enderecoCadrastrado = enderecoRepositorio.save(endereco);
-    }
 }
