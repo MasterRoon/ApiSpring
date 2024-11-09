@@ -42,10 +42,10 @@ public class UfService {
 
     public void atualizarPessoaId(String codigoUf, AtualizarUf atualizarUf) {
         var id = Long.valueOf(codigoUf);
-        var pessoaExiste = ufRepositorio.findById(id);
+        var ufExiste = ufRepositorio.findById(id);
 
-        if(pessoaExiste.isPresent()){
-            var atualizacao = pessoaExiste.get();
+        if(ufExiste.isPresent()){
+            var atualizacao = ufExiste.get();
 
             if(atualizarUf.sigla()!=null){
                 atualizacao.setSigla(atualizarUf.sigla());
@@ -58,7 +58,7 @@ public class UfService {
         }
     }
 
-    public void DeletePessoaByCodigoPessoa(Long codigoUf) {
+    public void DesativarMunicipioByCodigoMunicipio(Long codigoUf) {
         Optional<Uf> ufOptional = ufRepositorio.findById(codigoUf);
         if (ufOptional.isPresent()) {
             Uf uf = ufOptional.get();

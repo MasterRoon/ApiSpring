@@ -51,8 +51,8 @@ public class ControlUf {
     }
 
     @DeleteMapping("/{codigoUf}")
-    public ResponseEntity<Void> DeleteUf(@PathVariable Long codigoUf) {
-        service.DeletePessoaByCodigoPessoa(codigoUf);
+    public ResponseEntity<Void> DesativarUf(@PathVariable Long codigoUf) {
+        service.DesativarMunicipioByCodigoMunicipio(codigoUf);
         return ResponseEntity.noContent().build();
     }
 
