@@ -22,7 +22,7 @@ public class PessoaService {
 
     public long createPessoa(CriarPessoaDto criarPessoaDto) {
         var entity = new Pessoa(
-                criarPessoaDto.codigoPessoa(),//id da pessoa
+                null,//id da pessoa
                 null,
                 Instant.now(),               // creationTimestamp
                 new HashSet<>(),             // enderecos (passando um conjunto vazio, por exemplo)

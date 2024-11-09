@@ -11,6 +11,7 @@ import java.time.Instant;
 public class Endereco {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "CODIGO_ENDERECO")
     private Long codigoEndereco;
 

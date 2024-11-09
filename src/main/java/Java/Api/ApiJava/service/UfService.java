@@ -19,7 +19,7 @@ public class UfService {
 
 
     public long inserirUf(InserirUf inserirUf) {
-        var entity = new Uf(inserirUf.codigoUf(),                  // código da UF
+        var entity = new Uf(null,                  // código da UF
                 Instant.now(),                         // updateTimestamp
                 1,                                     // status (valor padrão, ex: ativo)
                 inserirUf.sigla(),                     // sigla da UF

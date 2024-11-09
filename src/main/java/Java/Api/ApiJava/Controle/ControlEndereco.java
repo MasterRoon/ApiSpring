@@ -28,11 +28,7 @@ public class ControlEndereco {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/{codigoEndereco}")
-    public ResponseEntity<List<RespostaEndereco>> getEndereco(@PathVariable Long codigoEndereco) {
-        var enderecoResponse = enderecoService.getEndereco(codigoEndereco);
-        return ResponseEntity.ok(enderecoResponse);
-    }
+
 
 
 

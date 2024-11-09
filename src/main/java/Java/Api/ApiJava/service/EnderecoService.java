@@ -51,10 +51,4 @@ public class EnderecoService {
         var enderecoCadrastrado = enderecoRepositorio.save(endereco);
     }
 
-    public RespostaEndereco getEndereco(Long codigoEndereco) {
-        // Busca o endereço pelo código e lança exceção caso não exista
-        var endereco = enderecoRepositorio.findById(codigoEndereco)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Endereço não encontrado"));
-
-    }
 }

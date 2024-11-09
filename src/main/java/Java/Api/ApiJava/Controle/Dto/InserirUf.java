@@ -1,4 +1,4 @@
 package Java.Api.ApiJava.Controle.Dto;
 
-public record InserirUf(Long codigoUf,String sigla,String nome) {
+public record InserirUf(String sigla,String nome) {
 }
