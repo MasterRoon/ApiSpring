@@ -9,6 +9,7 @@ import Java.Api.ApiJava.Repositorio.EnderecoRepositorio;
 import Java.Api.ApiJava.Repositorio.PessoaRepositorio;
 import Java.Api.ApiJava.entity.Endereco;
 import Java.Api.ApiJava.entity.Pessoa;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -16,10 +17,10 @@ import org.springframework.web.server.ResponseStatusException;
 
 
 import java.time.Instant;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 
@@ -119,7 +120,84 @@ public class PessoaService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional
+    public void atualizarPessoa(CriarPessoaDto criarPessoaDto) {
+        // Buscar a pessoa a partir do código fornecido
+        var pessoa = pessoaRepositorio.findById(criarPessoaDto.codigoPessoa())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Pessoa não encontrada"));
 
+        // Atualizar os dados básicos da pessoa
+        pessoa.setNome(criarPessoaDto.nome());
+        pessoa.setSobrenome(criarPessoaDto.sobrenome());
+        pessoa.setIdade(criarPessoaDto.idade());
+        pessoa.setLogin(criarPessoaDto.login());
+        pessoa.setSenha(criarPessoaDto.senha());
+        pessoa.setStatus(criarPessoaDto.status());
 
+        // Buscar endereços existentes da pessoa
+        var enderecosExistentes = pessoa.getEnderecos();
+
+        // Separar os códigos dos endereços recebidos
+        var codigosRecebidos = criarPessoaDto.enderecos().stream()
+                .map(CadrastroEndereco::codigoEndereco)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+
+        // Remover endereços que não estão mais na lista recebida
+        enderecosExistentes.removeIf(endereco -> !codigosRecebidos.contains(endereco.getCodigoEndereco()));
+
+        // Processar endereços da lista recebida
+        for (CadrastroEndereco enderecoDto : criarPessoaDto.enderecos()) {
+            if (enderecoDto.codigoEndereco() != null) {
+                // Atualizar endereço existente
+                var endereco = enderecosExistentes.stream()
+                        .filter(e -> e.getCodigoEndereco().equals(enderecoDto.codigoEndereco()))
+                        .findFirst()
+                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Endereço não encontrado"));
+
+                endereco.setNomeRua(enderecoDto.nomeRua());
+                endereco.setNumero(enderecoDto.numero());
+                endereco.setComplemento(enderecoDto.complemento());
+                endereco.setCep(enderecoDto.cep());
+
+                var bairro = bairroRepositorio.findById(enderecoDto.codigoBairro())
+                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Bairro não encontrado"));
+                endereco.setBairro(bairro);
+
+            } else {
+                // Adicionar novo endereço
+                var bairro = bairroRepositorio.findById(enderecoDto.codigoBairro())
+                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Bairro não encontrado"));
+
+                var novoEndereco = new Endereco(
+                        null,
+                        null,
+                        Instant.now(),
+                        enderecoDto.cep(),
+                        enderecoDto.complemento(),
+                        enderecoDto.nomeRua(),
+                        enderecoDto.numero(),
+                        bairro,
+                        pessoa
+                );
+                pessoa.getEnderecos().add(novoEndereco);
+            }
+        }
+
+        // Salvar as alterações
+        pessoaRepositorio.save(pessoa);
+    }
+
+    @Transactional
+    public void desativarPessoa(Long codigoPessoa) {
+        var pessoa = pessoaRepositorio.findById(codigoPessoa)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Pessoa não encontrada"));
+
+        // Atualiza o status para 2 (desativado)
+        pessoa.setStatus(2);
+
+        // Salva a atualização
+        pessoaRepositorio.save(pessoa);
+    }
 
 }
