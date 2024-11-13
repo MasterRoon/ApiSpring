@@ -13,7 +13,7 @@ import java.net.URI;
 import java.util.List;
 
 @RestController
-@RequestMapping("/pessoas")
+@RequestMapping("/pessoa")
 
 public class ControlPessoa {
 
@@ -27,7 +27,7 @@ public class ControlPessoa {
     @PostMapping
     public ResponseEntity<Void> cadastrarPessoaComEnderecos(@RequestBody CriarPessoaDto criarPessoaDto) {
         Long pessoaId = pessoaService.cadastrarPessoaComEnderecos(criarPessoaDto);
-        return ResponseEntity.created(URI.create("/pessoas/" + pessoaId)).build();
+        return ResponseEntity.created(URI.create("/pessoa/" + pessoaId)).build();
     }
 
     @GetMapping

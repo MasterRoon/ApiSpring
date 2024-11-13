@@ -12,7 +12,7 @@ import java.util.Set;
 public class Municipio {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     @Column(name = "CODIGO_MUNICIPIO")
     private Long codigoMunicipio;
 
