@@ -8,5 +8,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 
 public interface UfRepositorio extends JpaRepository<Uf, Long> {
-
+    boolean existsBySigla(String sigla);
+    boolean existsByNome(String nome);
 }

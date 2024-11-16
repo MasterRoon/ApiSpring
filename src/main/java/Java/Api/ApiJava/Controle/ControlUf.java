@@ -3,8 +3,10 @@ package Java.Api.ApiJava.Controle;
 
 import Java.Api.ApiJava.Controle.Dto.AtualizarUf;
 import Java.Api.ApiJava.Controle.Dto.InserirUf;
+import Java.Api.ApiJava.Controle.Dto.UfDto;
 import Java.Api.ApiJava.entity.Uf;
 import Java.Api.ApiJava.service.UfService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,9 +24,9 @@ public class ControlUf {
     }
 
     @PostMapping
-    public ResponseEntity<Uf> criarUf(@RequestBody InserirUf  inserirUf) {
-        var codigoUf = service.inserirUf(inserirUf);
-        return ResponseEntity.created(URI.create("/uf" + Long.valueOf(codigoUf).toString())).build();
+    public ResponseEntity<List<UfDto>> criarUf(@RequestBody InserirUf inserirUf) {
+        var ufs = service.inserirUf(inserirUf);
+        return ResponseEntity.ok(ufs);
     }
 
     @GetMapping("/{codigoUf}")

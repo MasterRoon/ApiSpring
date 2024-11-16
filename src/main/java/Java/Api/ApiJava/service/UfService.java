@@ -2,16 +2,20 @@ package Java.Api.ApiJava.service;
 
 import Java.Api.ApiJava.Controle.Dto.AtualizarUf;
 import Java.Api.ApiJava.Controle.Dto.InserirUf;
+import Java.Api.ApiJava.Controle.Dto.UfDto;
 import Java.Api.ApiJava.Repositorio.UfRepositorio;
 import Java.Api.ApiJava.entity.Uf;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class UfService {
@@ -20,7 +24,15 @@ public class UfService {
     private UfRepositorio ufRepositorio;
 
 
-    public long inserirUf(InserirUf inserirUf) {
+    public List<UfDto> inserirUf(InserirUf inserirUf) {
+
+        boolean siglaExistente = ufRepositorio.existsBySigla(inserirUf.sigla());
+        boolean nomeExistente = ufRepositorio.existsByNome(inserirUf.nome());
+
+        if (siglaExistente || nomeExistente) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT,
+                    "Já existe uma UF com a mesma sigla ou nome no banco de dados.");
+        }
         var entity = new Uf(
                 null,
                 Instant.now(),
@@ -31,7 +43,14 @@ public class UfService {
                 Instant.now()
         );
         var UfSalva = ufRepositorio.save(entity);
-        return UfSalva.getCodigoUf();
+        return ufRepositorio.findAll().stream()
+                .map(UfDto::new)
+                .collect(Collectors.toList());
+    }
+
+    public List<Uf> listarTodasUfs() {
+        var ListaUf = ufRepositorio.findAll();
+        return ListaUf;
     }
 
     public Optional<Uf> getUfByCodigoUf(String codigoUf) {
