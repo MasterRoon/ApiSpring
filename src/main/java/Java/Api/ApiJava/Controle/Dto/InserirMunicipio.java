@@ -2,5 +2,5 @@ package Java.Api.ApiJava.Controle.Dto;
 
 
 
-public record InserirMunicipio( String nome, Long codigoUf) {
+public record InserirMunicipio(Long codigoUf, String nome, Integer status) {
 }

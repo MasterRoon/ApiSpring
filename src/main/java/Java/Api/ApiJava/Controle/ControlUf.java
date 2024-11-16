@@ -49,7 +49,7 @@ public class ControlUf {
 
     @DeleteMapping
     public ResponseEntity<List<UfDto>> deletarUf(@RequestBody Long codigoUf) {
-        // Chama o método de serviço para realizar a operação
+
         List<UfDto> ufsAtualizadas = service.deletarUf(codigoUf);
 
         // Retorna todos os registros da tabela após a operação

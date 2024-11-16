@@ -1,14 +1,16 @@
 package Java.Api.ApiJava.service;
 
+
 import Java.Api.ApiJava.Controle.Dto.AtualizarMunicipio;
 import Java.Api.ApiJava.Controle.Dto.InserirMunicipio;
+import Java.Api.ApiJava.Controle.Dto.MunicipioDto;
 import Java.Api.ApiJava.Repositorio.MunicipioRepositorio;
 import Java.Api.ApiJava.Repositorio.UfRepositorio;
 import Java.Api.ApiJava.entity.Municipio;
 import Java.Api.ApiJava.entity.Uf;
-import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
@@ -27,67 +29,74 @@ public class MunicipioService {
         this.ufRepositorio = ufRepositorio;
     }
 
-    public Municipio criarMunicipio(InserirMunicipio inserirMunicipio) {
-        var uf = ufRepositorio.findById(inserirMunicipio.codigoUf())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "UF não encontrada"));
+    @Transactional
+    public List<MunicipioDto> criarMunicipio(InserirMunicipio dto) {
+        // Verifica se já existe um município com o mesmo nome
+        if (municipioRepositorio.existsByNome(dto.nome())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Já existe um município com este nome.");
+        }
 
+        // Busca a UF associada
+        Uf uf = ufRepositorio.findById(dto.codigoUf())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "UF não encontrada."));
+
+        // Cria o município
         Municipio municipio = new Municipio(
                 null,
-                inserirMunicipio.nome(),
-                1,
+                dto.nome(),
+                dto.status(),
                 uf,
                 new HashSet<>(),
                 Instant.now(),
-                null
+                Instant.now()
         );
 
-        return municipioRepositorio.save(municipio);
+        // Salva o município no banco de dados
+        municipioRepositorio.save(municipio);
+
+        // Retorna todos os registros da tabela Município
+        return municipioRepositorio.findAll()
+                .stream()
+                .map(MunicipioDto::new)
+                .toList();
     }
 
-    public void atualizarMunicipios(Long codigoMunicipio, AtualizarMunicipio atualizarMunicipio) {
-        // Busca o município existente pelo ID
-        Municipio municipio = municipioRepositorio.findById(codigoMunicipio)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Municipio não encontrado"));
+    public List<MunicipioDto> buscarMunicipios(Long codigoMunicipio, Long codigoUf, String nome, Integer status) {
+        var municipios = municipioRepositorio.findByFilters(codigoMunicipio, codigoUf, nome, status);
+        return municipios.stream().map(MunicipioDto::new).toList();
+    }
 
-        // Busca a UF associada
-        Uf uf = ufRepositorio.findById(atualizarMunicipio.codigoUf())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "UF não encontrada"));
+    @Transactional
+    public List<MunicipioDto> atualizarMunicipio(AtualizarMunicipio dto) {
+        // Valida se o código do município foi fornecido
+        if (dto.codigoMunicipio() == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "O código do município é obrigatório para a atualização.");
+        }
 
-        // Atualiza os campos do município
+        // Busca o município pelo código
+        Municipio municipio = municipioRepositorio.findById(dto.codigoMunicipio())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Município não encontrado."));
+
+        // Valida se o nome já existe em outro município
+        if (municipioRepositorio.existsByNomeAndCodigoMunicipioNot(dto.nome(), dto.codigoMunicipio())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Já existe um município com este nome.");
+        }
+
+        // Valida se o código da UF é válido
+        Uf uf = ufRepositorio.findById(dto.codigoUf())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "UF não encontrada."));
+
+        // Atualiza os campos
         municipio.setUf(uf);
-        municipio.setNome(atualizarMunicipio.nome());
-        municipio.setStatus(atualizarMunicipio.status());
+        municipio.setNome(dto.nome());
+        municipio.setStatus(dto.status());
+        municipio.setUpdateTimestamp(Instant.now());
 
-        // Salva o município atualizado
+        // Salva as alterações
         municipioRepositorio.save(municipio);
-    }
 
-    public List<Municipio> buscarMunicipios(Long codigoMunicipio, Long codigoUf, String nome, Integer status) {
-        Specification<Municipio> spec = Specification.where(null);
-
-        if (codigoMunicipio != null) {
-            spec = spec.and((root, query, builder) -> builder.equal(root.get("codigoMunicipio"), codigoMunicipio));
-        }
-        if (codigoUf != null) {
-            spec = spec.and((root, query, builder) -> builder.equal(root.get("uf").get("codigoUf"), codigoUf));
-        }
-        if (nome != null && !nome.isEmpty()) {
-            spec = spec.and((root, query, builder) -> builder.like(builder.lower(root.get("nome")), "%" + nome.toLowerCase() + "%"));
-        }
-        if (status != null) {
-            spec = spec.and((root, query, builder) -> builder.equal(root.get("status"), status));
-        }
-
-        return municipioRepositorio.findAll(spec);
-    }
-
-    public void desativarMunicipio(Long codigoMunicipio) {
-        var municipio = municipioRepositorio.findById(codigoMunicipio)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Município não encontrado"));
-
-        // Atualizar status para 2, indicando desativado
-        municipio.setStatus(2);
-        municipioRepositorio.save(municipio);
+        // Retorna todos os municípios atualizados
+        return municipioRepositorio.findAll().stream().map(MunicipioDto::new).toList();
     }
 
 }
