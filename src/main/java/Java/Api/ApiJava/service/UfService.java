@@ -5,6 +5,7 @@ import Java.Api.ApiJava.Controle.Dto.InserirUf;
 import Java.Api.ApiJava.Repositorio.UfRepositorio;
 import Java.Api.ApiJava.entity.Uf;
 import jakarta.persistence.EntityNotFoundException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -15,21 +16,22 @@ import java.util.Optional;
 @Service
 public class UfService {
 
+    @Autowired
     private UfRepositorio ufRepositorio;
 
 
     public long inserirUf(InserirUf inserirUf) {
-        var entity = new Uf(null,                  // código da UF
-                Instant.now(),                         // updateTimestamp
-                1,                                     // status (valor padrão, ex: ativo)
-                inserirUf.sigla(),                     // sigla da UF
-                inserirUf.nome(),                      // nome da UF
-                new HashSet<>(),                       // municípios (inicialmente vazio)
-                Instant.now());
+        var entity = new Uf(
+                null,
+                Instant.now(),
+                1,
+                inserirUf.sigla(),
+                inserirUf.nome(),
+                new HashSet<>(),
+                Instant.now()
+        );
         var UfSalva = ufRepositorio.save(entity);
-
         return UfSalva.getCodigoUf();
-
     }
 
     public Optional<Uf> getUfByCodigoUf(String codigoUf) {

@@ -4,6 +4,7 @@ import Java.Api.ApiJava.Controle.Dto.AtualizarDto;
 import Java.Api.ApiJava.Controle.Dto.CriarPessoaDto;
 import Java.Api.ApiJava.service.PessoaService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import org.springframework.http.ResponseEntity;
@@ -25,9 +26,13 @@ public class ControlPessoa {
     }
 
     @PostMapping
-    public ResponseEntity<Void> cadastrarPessoaComEnderecos(@RequestBody CriarPessoaDto criarPessoaDto) {
-        Long pessoaId = pessoaService.cadastrarPessoaComEnderecos(criarPessoaDto);
-        return ResponseEntity.created(URI.create("/pessoa/" + pessoaId)).build();
+    public ResponseEntity<String> criarPessoa(@RequestBody CriarPessoaDto criarPessoaDto) {
+        try {
+            pessoaService.salvarPessoa(criarPessoaDto);
+            return ResponseEntity.status(HttpStatus.CREATED).body("Pessoa criada com sucesso!");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro ao criar pessoa: " + e.getMessage());
+        }
     }
 
     @GetMapping

@@ -7,6 +7,7 @@ import Java.Api.ApiJava.Controle.Dto.CriarPessoaDto;
 import Java.Api.ApiJava.Repositorio.BairroRepositorio;
 import Java.Api.ApiJava.Repositorio.EnderecoRepositorio;
 import Java.Api.ApiJava.Repositorio.PessoaRepositorio;
+import Java.Api.ApiJava.entity.Bairro;
 import Java.Api.ApiJava.entity.Endereco;
 import Java.Api.ApiJava.entity.Pessoa;
 import jakarta.transaction.Transactional;
@@ -38,52 +39,51 @@ public class PessoaService {
         this.bairroRepositorio = bairroRepositorio;
     }
 
-    public Long cadastrarPessoaComEnderecos(CriarPessoaDto criarPessoaDto) {
+    @Transactional
+    public void salvarPessoa(CriarPessoaDto criarPessoaDto) {
         // Cria a entidade Pessoa
-        var pessoa = new Pessoa(
-                null,// código da pessoa, gerado automaticamente
+        Pessoa pessoa = new Pessoa(
+                null,
                 null,
                 Instant.now(),
-                new HashSet<>(), // endereços
-                1, // status ativo
-                criarPessoaDto.senha(),
-                criarPessoaDto.login(),
-                criarPessoaDto.idade(),
+                new HashSet<>(),
+                1,
+                criarPessoaDto.nome(),
                 criarPessoaDto.sobrenome(),
-                criarPessoaDto.nome()
+                criarPessoaDto.idade(),
+                criarPessoaDto.login(),
+                criarPessoaDto.senha()
         );
 
-        // Salva a pessoa primeiro, para obter o ID
+        // Processa os endereços
+        List<Endereco> enderecos = criarPessoaDto.enderecos().stream()
+                .map(enderecoDto -> {
+                    var bairro = bairroRepositorio.findById(enderecoDto.codigoBairro())
+                            .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Bairro não encontrado"));
+
+                    // Verifica se o bairro possui um código de município válido
+                    if (bairro.getMunicipio() == null) {
+                        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "O bairro informado não possui um município associado.");
+                    }
+
+                    return new Endereco(
+                            null,
+                            null,
+                            Instant.now(),
+                            enderecoDto.nomeRua(),
+                            enderecoDto.cep(),
+                            enderecoDto.complemento(),
+                            enderecoDto.numero(),
+                            bairro,
+                            pessoa
+                    );
+                })
+                .collect(Collectors.toList());
+
+        pessoa.setEnderecos(new HashSet<>(enderecos));
         pessoaRepositorio.save(pessoa);
-
-        // Processa e salva cada endereço
-        for (CadrastroEndereco cadrastroEndereco  : criarPessoaDto.enderecos()) {
-            var bairro = bairroRepositorio.findById(cadrastroEndereco.codigoBairro())
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Bairro não encontrado"));
-
-            var endereco = new Endereco(
-                    null,
-                    null,
-                    Instant.now(),
-                    cadrastroEndereco.cep(),
-                    cadrastroEndereco.complemento(),
-                    cadrastroEndereco.nomeRua(),
-                    cadrastroEndereco.numero(),
-                    bairro,
-                    pessoa
-            );
-
-            // Adiciona o endereço à lista de endereços da pessoa e salva
-            pessoa.getEnderecos().add(endereco);
-            enderecoRepositorio.save(endereco);
-        }
-
-        // Atualiza a pessoa com os endereços inseridos
-        pessoaRepositorio.save(pessoa);
-
-        // Retorna o ID da pessoa salva
-        return pessoa.getCodigoPessoa();
     }
+
 
     public List<AtualizarDto> listarPessoasFiltradas(Long codigoPessoa, String login, Integer status) {
         List<Pessoa> pessoas;
