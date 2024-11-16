@@ -6,9 +6,9 @@ import Java.Api.ApiJava.Controle.Dto.UfDto;
 import Java.Api.ApiJava.Repositorio.UfRepositorio;
 import Java.Api.ApiJava.entity.Uf;
 import jakarta.persistence.EntityNotFoundException;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
@@ -20,9 +20,12 @@ import java.util.stream.Collectors;
 @Service
 public class UfService {
 
-    @Autowired
-    private UfRepositorio ufRepositorio;
 
+    private final UfRepositorio ufRepositorio;
+
+    public UfService(UfRepositorio ufRepositorio) {
+        this.ufRepositorio = ufRepositorio;
+    }
 
     public List<UfDto> inserirUf(InserirUf inserirUf) {
 
@@ -42,52 +45,97 @@ public class UfService {
                 new HashSet<>(),
                 Instant.now()
         );
-        var UfSalva = ufRepositorio.save(entity);
+        ufRepositorio.save(entity);
         return ufRepositorio.findAll().stream()
                 .map(UfDto::new)
                 .collect(Collectors.toList());
     }
 
-    public List<Uf> listarTodasUfs() {
-        var ListaUf = ufRepositorio.findAll();
-        return ListaUf;
-    }
+    public List<UfDto> buscarUfs(Long codigoUf, String sigla, String nome, Integer status) {
+        List<Uf> ufs;
 
-    public Optional<Uf> getUfByCodigoUf(String codigoUf) {
-        return ufRepositorio.findById(Long.valueOf(codigoUf));
-    }
+        if (codigoUf != null) {
+            // Filtrar por código UF
+            ufs = ufRepositorio.findByCodigoUf(codigoUf)
+                    .map(List::of)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "UF não encontrada."));
 
-    public List<Uf> ListarUF() {
-        return ufRepositorio.findAll();
-    }
+        } else if (sigla != null) {
+            // Filtrar por sigla
+            ufs = ufRepositorio.findBySigla(sigla);
 
-    public void atualizarPessoaId(String codigoUf, AtualizarUf atualizarUf) {
-        var id = Long.valueOf(codigoUf);
-        var ufExiste = ufRepositorio.findById(id);
+        } else if (nome != null) {
+            // Filtrar por nome (parcial, sem case-sensitive)
+            ufs = ufRepositorio.findByNomeContainingIgnoreCase(nome);
 
-        if(ufExiste.isPresent()){
-            var atualizacao = ufExiste.get();
+        } else if (status != null) {
+            // Filtrar por status
+            ufs = ufRepositorio.findByStatus(status);
 
-            if(atualizarUf.sigla()!=null){
-                atualizacao.setSigla(atualizarUf.sigla());
-            }
-            if(atualizarUf.nome()!=null){
-                atualizacao.setNome(atualizarUf.nome());
-            }
-
-            ufRepositorio.save(atualizacao);
-        }
-    }
-
-    public void DesativarMunicipioByCodigoMunicipio(Long codigoUf) {
-        Optional<Uf> ufOptional = ufRepositorio.findById(codigoUf);
-        if (ufOptional.isPresent()) {
-            Uf uf = ufOptional.get();
-            uf.setStatus(2);  // Define o status como 2 para "desativado"
-            ufRepositorio.save(uf);
         } else {
-            throw new EntityNotFoundException("Pessoa com código " + codigoUf + " não encontrada.");
+            // Retornar todas as UFs se nenhum filtro for fornecido
+            ufs = ufRepositorio.findAll();
         }
+
+        // Converter para DTO
+        return ufs.stream()
+                .map(UfDto::new)
+                .collect(Collectors.toList());
     }
+
+    public List<UfDto> atualizarUf(AtualizarUf dto) {
+        // Valida se o código da UF foi fornecido
+        if (dto.codigoUf() == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "O código da UF é obrigatório para a atualização.");
+        }
+
+        // Busca a UF pelo código
+        Uf uf = ufRepositorio.findById(dto.codigoUf())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "UF não encontrada."));
+
+        // Valida se o novo nome já existe para outra UF
+        if (ufRepositorio.existsByNomeAndCodigoUfNot(dto.nome(), dto.codigoUf())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Já existe uma UF com este nome.");
+        }
+
+        // Valida se a nova sigla já existe para outra UF
+        if (ufRepositorio.existsBySiglaAndCodigoUfNot(dto.sigla(), dto.codigoUf())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Já existe uma UF com esta sigla.");
+        }
+
+        // Atualiza os campos permitidos
+        uf.setNome(dto.nome());
+        uf.setSigla(dto.sigla());
+        uf.setStatus(dto.status());
+        uf.setUpdateTimestamp(Instant.now());
+
+        ufRepositorio.save(uf);
+
+        // Retorna a lista de todas as UFs
+        return ufRepositorio.findAll()
+                .stream()
+                .map(UfDto::new)
+                .toList();
+    }
+
+    @Transactional
+    public List<UfDto> deletarUf(Long codigoUf) {
+        // Verifica se a UF existe pelo código
+        Uf uf = ufRepositorio.findById(codigoUf)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "UF não encontrada."));
+
+        // Atualiza o status para 2 (inativo)
+        uf.setStatus(2);
+        uf.setUpdateTimestamp(Instant.now());
+
+        ufRepositorio.save(uf);
+
+        // Retorna todos os registros da tabela UF
+        return ufRepositorio.findAll()
+                .stream()
+                .map(UfDto::new)
+                .toList();
+    }
+
 
 }

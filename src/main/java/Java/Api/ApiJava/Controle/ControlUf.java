@@ -4,13 +4,11 @@ package Java.Api.ApiJava.Controle;
 import Java.Api.ApiJava.Controle.Dto.AtualizarUf;
 import Java.Api.ApiJava.Controle.Dto.InserirUf;
 import Java.Api.ApiJava.Controle.Dto.UfDto;
-import Java.Api.ApiJava.entity.Uf;
 import Java.Api.ApiJava.service.UfService;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.URI;
+
 import java.util.List;
 
 @RestController
@@ -29,33 +27,34 @@ public class ControlUf {
         return ResponseEntity.ok(ufs);
     }
 
-    @GetMapping("/{codigoUf}")
-    public ResponseEntity<Uf> buscarUf(@PathVariable("codigoUf") String codigoUf) {
-        var pessoa = service.getUfByCodigoUf(codigoUf);
-        if(pessoa.isPresent()){
-            return ResponseEntity.ok(pessoa.get());
-        }else{
-            return ResponseEntity.notFound().build();
-        }
-
-    }
-
     @GetMapping
-    public ResponseEntity<List<Uf>> getAllUfs() {
-        var lista = service.ListarUF();
-        return ResponseEntity.ok(lista);
+    public ResponseEntity<List<UfDto>> buscarUfs(
+            @RequestParam(required = false) Long codigoUf,
+            @RequestParam(required = false) String sigla,
+            @RequestParam(required = false) String nome,
+            @RequestParam(required = false) Integer status
+    ) {
+        var ufs = service.buscarUfs(codigoUf, sigla, nome, status);
+        return ResponseEntity.ok(ufs);
     }
 
-    @PutMapping("/{codigoUf}")
-    public ResponseEntity<Void> atualizarUfCodigo(@PathVariable("codigoUf") String codigoUf, @RequestBody AtualizarUf atualizarUf){
-        service.atualizarPessoaId(codigoUf, atualizarUf );
-        return ResponseEntity.noContent().build();
+    @PutMapping
+    public ResponseEntity<List<UfDto>> atualizarUf(@RequestBody AtualizarUf dto) {
+        // Atualiza a UF e retorna todos os registros atualizados
+        List<UfDto> ufsAtualizadas = service.atualizarUf(dto);
+
+        // Retorna a resposta com todos os registros da tabela UF
+        return ResponseEntity.ok(ufsAtualizadas);
     }
 
-    @DeleteMapping("/{codigoUf}")
-    public ResponseEntity<Void> DesativarUf(@PathVariable Long codigoUf) {
-        service.DesativarMunicipioByCodigoMunicipio(codigoUf);
-        return ResponseEntity.noContent().build();
+    @DeleteMapping
+    public ResponseEntity<List<UfDto>> deletarUf(@RequestBody Long codigoUf) {
+        // Chama o método de serviço para realizar a operação
+        List<UfDto> ufsAtualizadas = service.deletarUf(codigoUf);
+
+        // Retorna todos os registros da tabela após a operação
+        return ResponseEntity.ok(ufsAtualizadas);
     }
+
 
 }
