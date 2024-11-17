@@ -19,36 +19,6 @@ public class ControlBairro {
         this.bairroService = bairroService;
     }
 
-    @PostMapping
-    public ResponseEntity<Bairro> cadastrarBairro(@RequestBody InserirBairro inserirBairro) {
-        Bairro bairro = bairroService.criarBairro(inserirBairro);
-        return ResponseEntity.ok(bairro);
-    }
 
-    @PutMapping("/{codigoBairro}")
-    public ResponseEntity<Void> atualizarBairro(
-            @PathVariable Long codigoBairro,
-            @RequestBody AtualizarBairro atualizarBairro) {
-
-        bairroService.atualizarBairros(codigoBairro, atualizarBairro);
-        return ResponseEntity.ok().build();
-    }
-
-    @GetMapping
-    public ResponseEntity<List<Bairro>> buscarBairros(
-            @RequestParam(required = false) Long codigoBairro,
-            @RequestParam(required = false) Long codigoMunicipio,
-            @RequestParam(required = false) String nome,
-            @RequestParam(required = false) Integer status) {
-
-        List<Bairro> bairros = bairroService.buscarBairros(codigoBairro, codigoMunicipio, nome, status);
-        return ResponseEntity.ok(bairros);
-    }
-
-    @DeleteMapping("/{codigoBairro}")
-    public ResponseEntity<Void> desativarBairro(@PathVariable Long codigoBairro) {
-        bairroService.desativarBairro(codigoBairro);
-        return ResponseEntity.noContent().build();
-    }
 
 }

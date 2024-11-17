@@ -9,7 +9,9 @@ import Java.Api.ApiJava.service.MunicipioService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+
 import java.util.List;
+
 
 @RestController
 @RequestMapping("/municipio")
@@ -42,12 +44,23 @@ public class ControlMunicio {
     }
 
     @PutMapping
-    public ResponseEntity<List<MunicipioDto>> atualizarMunicipio(@RequestBody AtualizarMunicipio dto) {
+    public ResponseEntity<List<MunicipioDto>> atualizarMunicipio( @RequestBody AtualizarMunicipio dto) {
+
         // Chama o serviço para atualizar o município
         var municipiosAtualizados = municipioService.atualizarMunicipio(dto);
 
         // Retorna os municípios atualizados
         return ResponseEntity.ok(municipiosAtualizados);
     }
+
+    @DeleteMapping
+    public ResponseEntity<List<MunicipioDto>> deletarMunicipio(@RequestBody Long codigoMunicipio) {
+
+        List<MunicipioDto> municipioAtualizado = municipioService.deletarMunicipio(codigoMunicipio);
+
+        // Retorna todos os registros da tabela após a operação
+        return ResponseEntity.ok(municipioAtualizado);
+    }
+
 
 }

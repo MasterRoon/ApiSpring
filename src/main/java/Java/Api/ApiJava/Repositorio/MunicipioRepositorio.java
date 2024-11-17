@@ -30,4 +30,5 @@ public interface MunicipioRepositorio extends JpaRepository<Municipio, Long>{
         );
 
 
+
 }

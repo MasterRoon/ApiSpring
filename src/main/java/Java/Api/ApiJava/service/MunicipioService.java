@@ -68,6 +68,10 @@ public class MunicipioService {
 
     @Transactional
     public List<MunicipioDto> atualizarMunicipio(AtualizarMunicipio dto) {
+
+        ValidacaoUtil.validarCampoObrigatorio(dto.nome(), "O campo 'nome' é obrigatório e não pode estar vazio.");
+
+
         // Valida se o código do município foi fornecido
         if (dto.codigoMunicipio() == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "O código do município é obrigatório para a atualização.");
@@ -97,6 +101,34 @@ public class MunicipioService {
 
         // Retorna todos os municípios atualizados
         return municipioRepositorio.findAll().stream().map(MunicipioDto::new).toList();
+    }
+
+    public static class ValidacaoUtil {
+        public static void validarCampoObrigatorio(String campo, String mensagem) {
+            if (campo == null || campo.trim().isEmpty()) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, mensagem);
+            }
+        }
+    }
+
+
+    @Transactional
+    public List<MunicipioDto> deletarMunicipio(Long codigoMunicipio) {
+        // Verifica se a Municipio existe pelo código
+        Municipio municipio = municipioRepositorio.findById(codigoMunicipio)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Municipio não encontrado."));
+
+        // Atualiza o status para 2 (inativo)
+        municipio.setStatus(2);
+        municipio.setUpdateTimestamp(Instant.now());
+
+        municipioRepositorio.save(municipio);
+
+        // Retorna todos os registros da tabela Municipio
+        return municipioRepositorio.findAll()
+                .stream()
+                .map(MunicipioDto::new)
+                .toList();
     }
 
 }
