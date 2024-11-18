@@ -37,7 +37,7 @@ public class Pessoa {
     @Column(name = "STATUS")
     private Integer status;
 
-    @OneToMany(mappedBy = "pessoa", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "pessoa", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private List<Endereco> enderecos = new ArrayList<>();
 
     @CreationTimestamp
