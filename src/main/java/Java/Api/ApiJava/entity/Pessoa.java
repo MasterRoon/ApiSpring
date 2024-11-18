@@ -1,10 +1,13 @@
 package Java.Api.ApiJava.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -34,8 +37,8 @@ public class Pessoa {
     @Column(name = "STATUS")
     private Integer status;
 
-    @OneToMany(mappedBy = "pessoa")
-    private Set<Endereco> enderecos;
+    @OneToMany(mappedBy = "pessoa", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Endereco> enderecos = new ArrayList<>();
 
     @CreationTimestamp
     private Instant creationTimestamp;
@@ -45,11 +48,10 @@ public class Pessoa {
     public Pessoa() {
     }
 
-    public Pessoa(Long codigoPessoa, Instant updateTimestamp, Instant creationTimestamp, Set<Endereco> enderecos, Integer status, String senha, String login, Integer idade, String sobrenome, String nome) {
+    public Pessoa(Long codigoPessoa, Instant updateTimestamp, Instant creationTimestamp, Integer status, String senha, String login, Integer idade, String sobrenome, String nome) {
         this.codigoPessoa = codigoPessoa;
         this.updateTimestamp = updateTimestamp;
         this.creationTimestamp = creationTimestamp;
-        this.enderecos = enderecos;
         this.status = status;
         this.senha = senha;
         this.login = login;
@@ -66,11 +68,11 @@ public class Pessoa {
         this.codigoPessoa = codigoPessoa;
     }
 
-    public Set<Endereco> getEnderecos() {
+    public List<Endereco> getEnderecos() {
         return enderecos;
     }
 
-    public void setEnderecos(Set<Endereco> enderecos) {
+    public void setEnderecos(List<Endereco> enderecos) {
         this.enderecos = enderecos;
     }
 

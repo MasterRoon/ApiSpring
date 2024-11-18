@@ -2,10 +2,9 @@ package Java.Api.ApiJava.Controle.Dto;
 
 import java.util.List;
 
-public record CadrastroEndereco(Long codigoEndereco,
-                                Long codigoBairro,
+public record CadrastroEndereco(Long codigoBairro,
                                 String nomeRua,
-                                Integer numero,
+                                String numero,
                                 String complemento,
                                 String cep) {
 }

@@ -16,11 +16,11 @@ public class Endereco {
     private Long codigoEndereco;
 
     @ManyToOne
-    @JoinColumn(name = "CODIGO_PESSOA")
+    @JoinColumn(name = "CODIGO_PESSOA", nullable = false)
     private Pessoa pessoa;
 
     @ManyToOne
-    @JoinColumn(name = "CODIGO_BAIRRO")
+    @JoinColumn(name = "CODIGO_BAIRRO", nullable = false)
     private Bairro bairro;
 
     @Column(name = "NOME_RUA", length = 210)
