@@ -33,7 +33,7 @@ public class PessoaService {
 
 
     @Transactional
-    public Pessoa salvarPessoaComEnderecos(CriarPessoaDto pessoaDto) {
+    public void salvarPessoaComEnderecos(CriarPessoaDto pessoaDto) {
         // Cria a entidade Pessoa
         Pessoa pessoa = new Pessoa();
         pessoa.setNome(pessoaDto.nome());
@@ -61,7 +61,7 @@ public class PessoaService {
         pessoa.setEnderecos(enderecos);
 
         // Salva a Pessoa com seus Endereços
-        return pessoaRepositorio.save(pessoa);
+        pessoaRepositorio.save(pessoa);
     }
 
     public List<Pessoa> listarTodasAsPessoas() {
