@@ -42,6 +42,7 @@ public class ControlPessoa {
                         pessoa.getSobrenome(),
                         pessoa.getIdade(),
                         pessoa.getLogin(),
+                        pessoa.getSenha(),
                         pessoa.getStatus(),
                         Collections.emptyList() // Lista de endereços vazia
                 ))
@@ -65,6 +66,7 @@ public class ControlPessoa {
                     pessoa.getSobrenome(),
                     pessoa.getIdade(),
                     pessoa.getLogin(),
+                    pessoa.getSenha(),
                     pessoa.getStatus(),
                     pessoa.getEnderecos().stream().map(endereco -> new EnderecoRespostaDto(
                                     endereco.getCodigoEndereco(),
@@ -87,6 +89,7 @@ public class ControlPessoa {
                         pessoa.getSobrenome(),
                         pessoa.getIdade(),
                         pessoa.getLogin(),
+                        pessoa.getSenha(),
                         pessoa.getStatus(),
                         Collections.emptyList())) // Endereços vazios
                 .collect(Collectors.toList());
@@ -103,6 +106,7 @@ public class ControlPessoa {
                 pessoaAtualizada.getSobrenome(),
                 pessoaAtualizada.getIdade(),
                 pessoaAtualizada.getLogin(),
+                pessoaAtualizada.getSenha(),
                 pessoaAtualizada.getStatus(),
                 pessoaAtualizada.getEnderecos().stream().map(endereco -> new EnderecoRespostaDto(
                                 endereco.getCodigoEndereco(),

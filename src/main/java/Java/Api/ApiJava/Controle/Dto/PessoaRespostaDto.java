@@ -7,6 +7,7 @@ public record PessoaRespostaDto(Long codigoPessoa,
                                 String sobrenome,
                                 Integer idade,
                                 String login,
+                                String senha,
                                 Integer status,
                                 List<EnderecoRespostaDto> enderecos) {
 }
