@@ -162,4 +162,18 @@ public class PessoaService {
         return pessoaRepositorio.save(pessoa);
     }
 
+    @Transactional
+    public void desativarPessoa(Long codigoPessoa) {
+        Pessoa pessoa = pessoaRepositorio.findById(codigoPessoa)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Pessoa não encontrada"));
+
+        if (pessoa.getStatus() == 2) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "A pessoa já está desativada.");
+        }
+
+        pessoa.setStatus(2);
+        pessoaRepositorio.save(pessoa);
+
+    }
+
 }

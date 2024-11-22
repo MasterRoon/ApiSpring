@@ -12,7 +12,8 @@ import java.util.Set;
 public class Municipio {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "sequence_Municipio_generator")
+    @SequenceGenerator(name = "sequence_Municipio_generator", sequenceName = "Sequence_Municipio", allocationSize = 1)
     @Column(name = "CODIGO_MUNICIPIO")
     private Long codigoMunicipio;
 

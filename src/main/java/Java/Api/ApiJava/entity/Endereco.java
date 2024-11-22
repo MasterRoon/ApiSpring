@@ -11,7 +11,8 @@ import java.time.Instant;
 public class Endereco {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "sequence_Endereco_generator")
+    @SequenceGenerator(name = "sequence_Endereco_generator", sequenceName = "Sequence_Endereco", allocationSize = 1)
     @Column(name = "CODIGO_ENDERECO")
     private Long codigoEndereco;
 

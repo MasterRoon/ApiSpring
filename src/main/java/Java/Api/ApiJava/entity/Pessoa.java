@@ -15,7 +15,8 @@ import java.util.Set;
 public class Pessoa {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "sequence_Pessoa_generator")
+    @SequenceGenerator(name = "sequence_Pessoa_generator", sequenceName = "Sequence_Pessoa", allocationSize = 1)
     @Column(name = "CODIGO_PESSOA")
     private Long codigoPessoa;
 

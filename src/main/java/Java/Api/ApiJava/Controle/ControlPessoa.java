@@ -9,12 +9,16 @@ import Java.Api.ApiJava.entity.Pessoa;
 import Java.Api.ApiJava.service.PessoaService;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @RestController
@@ -119,6 +123,22 @@ public class ControlPessoa {
         );
 
         return ResponseEntity.ok(pessoaRespostaDto);
+    }
+
+    @DeleteMapping
+    public ResponseEntity<Map<String, String>> desativarPessoa(@RequestBody Map<String, Long> payload) {
+        Long codigoPessoa = payload.get("codigoPessoa");
+
+        if (codigoPessoa == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "O campo 'codigoPessoa' é obrigatório.");
+        }
+
+        pessoaService.desativarPessoa(codigoPessoa);
+
+        // Mensagem de retorno
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "Pessoa com código " + codigoPessoa + " desativada com sucesso.");
+        return ResponseEntity.ok(response);
     }
 
 

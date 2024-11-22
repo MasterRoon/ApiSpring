@@ -13,7 +13,8 @@ import java.util.Set;
 public class Bairro {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE ,generator = "sequence_Bairro_generator")
+    @SequenceGenerator(name = "sequence_Bairro_generator", sequenceName = "Sequence_Bairro", allocationSize = 1)
     @Column(name = "CODIGO_BAIRRO")
     private Long codigoBairro;
 

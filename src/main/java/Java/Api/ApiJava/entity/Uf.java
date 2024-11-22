@@ -12,7 +12,8 @@ import java.util.Set;
 public class Uf {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "sequence_Uf_generator")
+    @SequenceGenerator(name = "sequence_Uf_generator", sequenceName = "Sequence_Uf", allocationSize = 1)
     @Column(name = "CODIGO_UF")
     private Long codigoUf;
 
