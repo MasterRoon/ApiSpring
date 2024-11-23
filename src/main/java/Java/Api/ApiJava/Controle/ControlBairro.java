@@ -27,12 +27,17 @@ public class ControlBairro {
     }
 
     @GetMapping
-    public ResponseEntity<List<BairroDto>> buscarBairros(
+    public ResponseEntity<?> buscarBairros(
             @RequestParam(required = false) Long codigoBairro,
             @RequestParam(required = false) Long codigoMunicipio,
             @RequestParam(required = false) String nome,
             @RequestParam(required = false) Integer status) {
-        List<BairroDto> bairros = bairroService.buscarBairros(codigoBairro, codigoMunicipio, nome, status);
+        var bairros = bairroService.buscarBairros(codigoBairro, codigoMunicipio, nome, status);
+
+        if(codigoBairro != null && bairros.size()==1){
+            return ResponseEntity.ok(bairros.get(0));
+        }
+
         return ResponseEntity.ok(bairros);
     }
 
@@ -45,9 +50,9 @@ public class ControlBairro {
     }
 
     @DeleteMapping
-    public ResponseEntity<List<BairroDto>> deletarMunicipio(@RequestBody Long codigoBairro) {
+    public ResponseEntity<List<BairroDto>> deletarMunicipio(@RequestBody AtualizarBairro codigoBairroDto) {
 
-        List<BairroDto> bairroAtualizado = bairroService.deletarBairro(codigoBairro);
+        List<BairroDto> bairroAtualizado = bairroService.deletarBairro(codigoBairroDto);
 
         // Retorna todos os registros da tabela após a operação
         return ResponseEntity.ok(bairroAtualizado);

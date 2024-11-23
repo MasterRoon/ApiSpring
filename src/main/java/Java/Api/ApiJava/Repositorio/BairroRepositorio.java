@@ -9,7 +9,6 @@ import org.springframework.stereotype.Repository;
 
 public interface BairroRepositorio extends JpaRepository<Bairro, Long>, JpaSpecificationExecutor<Bairro> {
     boolean existsByNomeAndMunicipioCodigoMunicipio(String nome, Long codigoMunicipio);
-    boolean existsByNomeAndCodigoBairroNot(String nome, Long codigoBairro);
-
+    boolean existsByNomeAndCodigoBairroNot(String nome, Long codigoBairro );
 
 }

@@ -67,6 +67,17 @@ public class BairroService {
     }
 
     public List<BairroDto> buscarBairros(Long codigoBairro, Long codigoMunicipio, String nome, Integer status) {
+
+
+        if (codigoBairro != null && codigoBairro <= 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "O campo 'codigoBairro' deve ser um número positivo.");
+        }
+
+        // Verifica se o código do município é válido
+        if (codigoMunicipio != null && codigoMunicipio <= 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "O campo 'codigoMunicipio' deve ser um número positivo.");
+        }
+
         // Realiza a busca com base nos critérios
         List<Bairro> bairros = bairroRepositorio.findAll((root, query, criteriaBuilder) -> {
             List<Predicate> predicates = new ArrayList<>();
@@ -109,8 +120,8 @@ public class BairroService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Bairro não encontrado."));
 
         // Valida se o nome já existe em outro bairro
-        if (bairroRepositorio.existsByNomeAndCodigoBairroNot(dto.nome(), dto.codigoBairro())) {
-            throw new ResponseStatusException(HttpStatus.CONFLICT, "Já existe um bairro com este nome.");
+        if (bairroRepositorio.existsByNomeAndCodigoBairroNot(dto.nome(), dto.codigoBairro()) ) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Já existe um bairro com este nome nessa cidade.");
         }
 
         // Valida se o código do município é válido
@@ -128,16 +139,11 @@ public class BairroService {
         return bairroRepositorio.findAll().stream().map(BairroDto::new).toList();
     }
 
-    public static class ValidacaoUtil {
-        public static void validarCampoObrigatorio(String campo, String mensagem) {
-            if (campo == null || campo.trim().isEmpty()) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, mensagem);
-            }
-        }
-    }
 
     @Transactional
-    public List<BairroDto> deletarBairro(Long codigoBairro) {
+    public List<BairroDto> deletarBairro(AtualizarBairro codigoBairroDto) {
+        long codigoBairro= codigoBairroDto.codigoBairro();
+
         // Verifica se a Municipio existe pelo código
         Bairro bairro = bairroRepositorio.findById(codigoBairro)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Bairro não encontrado."));

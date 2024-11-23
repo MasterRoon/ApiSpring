@@ -30,6 +30,10 @@ public class UfService {
         boolean siglaExistente = ufRepositorio.existsBySigla(inserirUf.sigla());
         boolean nomeExistente = ufRepositorio.existsByNome(inserirUf.nome());
 
+        if(inserirUf.status() != 1 || inserirUf.status() != 2){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "O campo 'status' é obrigatório ter valores de 1 ou 2 .");
+        }
+
         if (inserirUf.sigla() == null || inserirUf.sigla().trim().isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "O campo 'Sigla' é obrigatório e não pode estar vazio.");
         }
@@ -142,8 +146,8 @@ public class UfService {
         Uf uf = ufRepositorio.findById(codigoUf)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "UF não encontrada."));
 
-        if (codigoUf == 2 ) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "O código da UF já está desativado");
+        if (uf.getStatus() == 2) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "O código do Municipio já está desativado.");
         }
 
         // Atualiza o status para 2 (inativo)

@@ -94,9 +94,11 @@ public class PessoaService {
     @Transactional
     public Pessoa atualizarPessoaComEnderecos(AtualizarPessoaDto pessoaDto) {
 
+
         // Busca a pessoa existente
         Pessoa pessoa = pessoaRepositorio.findById(pessoaDto.codigoPessoa())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Pessoa não encontrada"));
+
 
         // Atualiza os campos da Pessoa
         pessoa.setNome(pessoaDto.nome());

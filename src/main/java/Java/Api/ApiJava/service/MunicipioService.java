@@ -36,6 +36,7 @@ public class MunicipioService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "O campo 'nome' é obrigatório e não pode estar vazio.");
         }
 
+
         if (dto.codigoUf() == null ) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "O campo 'codigoUf' é obrigatório e não pode estar vazio.");
         }
@@ -123,15 +124,17 @@ public class MunicipioService {
 
 
     @Transactional
-    public List<MunicipioDto> deletarMunicipio(Long codigoMunicipio) {
+    public List<MunicipioDto> deletarMunicipio(AtualizarMunicipio codigoMunicipioDto) {
+        Long codigoMunicipio = codigoMunicipioDto.codigoMunicipio();
 
-        if (codigoMunicipio == 2 ) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "O código do Municipio já está desativado");
-        }
 
-        // Verifica se a Municipio existe pelo código
+        // Verifica se o Municipio existe pelo código
         Municipio municipio = municipioRepositorio.findById(codigoMunicipio)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Municipio não encontrado."));
+
+        if (municipio.getStatus() == 2) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "O código do Municipio já está desativado.");
+        }
 
         // Atualiza o status para 2 (inativo)
         municipio.setStatus(2);

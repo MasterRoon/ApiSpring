@@ -43,7 +43,7 @@ public class ControlMunicio {
 
         if (codigoMunicipio != null && municipios.size() == 1) {
             // Retorna o único município diretamente
-            return ResponseEntity.ok(municipios.get(0));
+            return ResponseEntity.ok(municipios.getFirst());
         }
 
         // Retorna a lista de municípios
@@ -61,12 +61,11 @@ public class ControlMunicio {
     }
 
     @DeleteMapping
-    public ResponseEntity<List<MunicipioDto>> deletarMunicipio(@RequestBody Long codigoMunicipio) {
-
-        List<MunicipioDto> municipioAtualizado = municipioService.deletarMunicipio(codigoMunicipio);
+    public ResponseEntity<List<MunicipioDto>> deletarMunicipio(@RequestBody AtualizarMunicipio codigoMunicipioDto) {
+        List<MunicipioDto> municipiosAtualizados = municipioService.deletarMunicipio(codigoMunicipioDto);
 
         // Retorna todos os registros da tabela após a operação
-        return ResponseEntity.ok(municipioAtualizado);
+        return ResponseEntity.ok(municipiosAtualizados);
     }
 
 
