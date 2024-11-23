@@ -5,6 +5,7 @@ package Java.Api.ApiJava.service;
 import Java.Api.ApiJava.Controle.Dto.AtualizarPessoaDto;
 import Java.Api.ApiJava.Controle.Dto.CadrastroEndereco;
 import Java.Api.ApiJava.Controle.Dto.CriarPessoaDto;
+import Java.Api.ApiJava.Controle.Dto.ImpressãoPessoa.*;
 import Java.Api.ApiJava.Repositorio.BairroRepositorio;
 import Java.Api.ApiJava.Repositorio.EnderecoRepositorio;
 import Java.Api.ApiJava.Repositorio.PessoaRepositorio;
@@ -89,9 +90,48 @@ public class PessoaService {
         }
     }
 
-    public Pessoa buscarPorCodigoPessoa(Long codigoPessoa) {
-        return pessoaRepositorio.findById(codigoPessoa)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Pessoa não encontrada"));
+    @Transactional
+    public PessoaRespostaCompletaDto buscarPessoaCompleta(Long codigoPessoa) {
+        Pessoa pessoa = pessoaRepositorio.findById(codigoPessoa)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Pessoa não encontrada."));
+
+        // Mapeamento explícito para DTO
+        return new PessoaRespostaCompletaDto(
+                pessoa.getCodigoPessoa(),
+                pessoa.getNome(),
+                pessoa.getSobrenome(),
+                pessoa.getIdade(),
+                pessoa.getLogin(),
+                pessoa.getSenha(),
+                pessoa.getStatus(),
+                pessoa.getEnderecos().stream().map(endereco -> new EnderecoRespostaCompletaDto(
+                        endereco.getCodigoEndereco(),
+                        endereco.getPessoa().getCodigoPessoa(),
+                        endereco.getBairro().getCodigoBairro(),
+                        endereco.getNomeRua(),
+                        String.valueOf(endereco.getNumero()), // Conversão para String
+                        endereco.getComplemento(),
+                        endereco.getCep(),
+                        new BairroRespostaCompletaDto(
+                                endereco.getBairro().getCodigoBairro(),
+                                endereco.getBairro().getMunicipio().getCodigoMunicipio(),
+                                endereco.getBairro().getNome(),
+                                endereco.getBairro().getStatus(),
+                                new MunicipioRespostaCompletaDto(
+                                        endereco.getBairro().getMunicipio().getCodigoMunicipio(),
+                                        endereco.getBairro().getMunicipio().getUf().getCodigoUf(),
+                                        endereco.getBairro().getMunicipio().getNome(),
+                                        endereco.getBairro().getMunicipio().getStatus(),
+                                        new UfRespostaDto(
+                                                endereco.getBairro().getMunicipio().getUf().getCodigoUf(),
+                                                endereco.getBairro().getMunicipio().getUf().getSigla(),
+                                                endereco.getBairro().getMunicipio().getUf().getNome(),
+                                                endereco.getBairro().getMunicipio().getUf().getStatus()
+                                        )
+                                )
+                        )
+                )).toList()
+        );
     }
 
     @Transactional

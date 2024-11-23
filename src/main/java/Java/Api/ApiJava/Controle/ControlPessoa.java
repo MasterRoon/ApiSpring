@@ -4,6 +4,7 @@ package Java.Api.ApiJava.Controle;
 import Java.Api.ApiJava.Controle.Dto.AtualizarPessoaDto;
 import Java.Api.ApiJava.Controle.Dto.CriarPessoaDto;
 import Java.Api.ApiJava.Controle.Dto.EnderecoRespostaDto;
+import Java.Api.ApiJava.Controle.Dto.ImpressãoPessoa.PessoaRespostaCompletaDto;
 import Java.Api.ApiJava.Controle.Dto.PessoaRespostaDto;
 import Java.Api.ApiJava.entity.Pessoa;
 import Java.Api.ApiJava.service.PessoaService;
@@ -61,28 +62,14 @@ public class ControlPessoa {
             @RequestParam(required = false) String login,
             @RequestParam(required = false) Long codigoPessoa) {
 
+
         // Se codigoPessoa for fornecido, retorna uma pessoa com endereços
         if (codigoPessoa != null) {
-            Pessoa pessoa = pessoaService.buscarPorCodigoPessoa(codigoPessoa);
-            PessoaRespostaDto pessoaDto = new PessoaRespostaDto(
-                    pessoa.getCodigoPessoa(),
-                    pessoa.getNome(),
-                    pessoa.getSobrenome(),
-                    pessoa.getIdade(),
-                    pessoa.getLogin(),
-                    pessoa.getSenha(),
-                    pessoa.getStatus(),
-                    pessoa.getEnderecos().stream().map(endereco -> new EnderecoRespostaDto(
-                                    endereco.getCodigoEndereco(),
-                                    endereco.getBairro().getCodigoBairro(),
-                                    endereco.getNomeRua(),
-                                    String.valueOf(endereco.getNumero()),
-                                    endereco.getComplemento(),
-                                    endereco.getCep()))
-                            .collect(Collectors.toList())
-            );
+            PessoaRespostaCompletaDto pessoaDto = pessoaService.buscarPessoaCompleta(codigoPessoa);
             return ResponseEntity.ok(pessoaDto);
         }
+
+
 
         // Caso contrário, retorna lista de pessoas (sem endereços)
         List<Pessoa> pessoas = pessoaService.buscarPorStatusOuLogin(status, login);
