@@ -31,6 +31,15 @@ public class MunicipioService {
 
     @Transactional
     public List<MunicipioDto> criarMunicipio(InserirMunicipio dto) {
+
+        if (dto.nome() == null || dto.nome().trim().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "O campo 'nome' é obrigatório e não pode estar vazio.");
+        }
+
+        if (dto.codigoUf() == null ) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "O campo 'codigoUf' é obrigatório e não pode estar vazio.");
+        }
+
         // Verifica se já existe um município com o mesmo nome
         if (municipioRepositorio.existsByNome(dto.nome())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Já existe um município com este nome.");
@@ -62,6 +71,7 @@ public class MunicipioService {
     }
 
     public List<MunicipioDto> buscarMunicipios(Long codigoMunicipio, Long codigoUf, String nome, Integer status) {
+
         var municipios = municipioRepositorio.findByFilters(codigoMunicipio, codigoUf, nome, status);
         return municipios.stream().map(MunicipioDto::new).toList();
     }
@@ -114,6 +124,11 @@ public class MunicipioService {
 
     @Transactional
     public List<MunicipioDto> deletarMunicipio(Long codigoMunicipio) {
+
+        if (codigoMunicipio == 2 ) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "O código do Municipio já está desativado");
+        }
+
         // Verifica se a Municipio existe pelo código
         Municipio municipio = municipioRepositorio.findById(codigoMunicipio)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Municipio não encontrado."));

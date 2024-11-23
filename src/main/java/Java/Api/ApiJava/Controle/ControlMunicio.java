@@ -33,13 +33,20 @@ public class ControlMunicio {
     }
 
     @GetMapping
-    public ResponseEntity<List<MunicipioDto>> buscarMunicipios(
+    public ResponseEntity<?> buscarMunicipios(
             @RequestParam(required = false) Long codigoMunicipio,
             @RequestParam(required = false) Long codigoUf,
             @RequestParam(required = false) String nome,
             @RequestParam(required = false) Integer status
     ) {
         var municipios = municipioService.buscarMunicipios(codigoMunicipio, codigoUf, nome, status);
+
+        if (codigoMunicipio != null && municipios.size() == 1) {
+            // Retorna o único município diretamente
+            return ResponseEntity.ok(municipios.get(0));
+        }
+
+        // Retorna a lista de municípios
         return ResponseEntity.ok(municipios);
     }
 

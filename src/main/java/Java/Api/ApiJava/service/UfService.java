@@ -30,6 +30,14 @@ public class UfService {
         boolean siglaExistente = ufRepositorio.existsBySigla(inserirUf.sigla());
         boolean nomeExistente = ufRepositorio.existsByNome(inserirUf.nome());
 
+        if (inserirUf.sigla() == null || inserirUf.sigla().trim().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "O campo 'Sigla' é obrigatório e não pode estar vazio.");
+        }
+
+        if (inserirUf.nome() == null || inserirUf.nome().trim().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "O campo 'Nome' é obrigatório.");
+        }
+
         if (siglaExistente || nomeExistente) {
             throw new ResponseStatusException(HttpStatus.CONFLICT,
                     "Já existe uma UF com a mesma sigla ou nome no banco de dados.");
@@ -83,8 +91,20 @@ public class UfService {
 
     public List<UfDto> atualizarUf(AtualizarUf dto) {
         // Valida se o código da UF foi fornecido
-        if (dto.codigoUf() == null) {
+        if (dto.codigoUf() == null ) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "O código da UF é obrigatório para a atualização.");
+        }
+
+        if (dto.sigla() == null|| dto.sigla().trim().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "O Sigla é obrigatório para a atualização.");
+        }
+
+        if (dto.nome() == null || dto.nome().trim().isEmpty() ) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "O Nome é obrigatório para a atualização.");
+        }
+
+        if (dto.status() == null ) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "O Status é obrigatório para a atualização.");
         }
 
         // Busca a UF pelo código
@@ -121,6 +141,10 @@ public class UfService {
         // Verifica se a UF existe pelo código
         Uf uf = ufRepositorio.findById(codigoUf)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "UF não encontrada."));
+
+        if (codigoUf == 2 ) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "O código da UF já está desativado");
+        }
 
         // Atualiza o status para 2 (inativo)
         uf.setStatus(2);

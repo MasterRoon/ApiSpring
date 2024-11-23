@@ -30,6 +30,11 @@ public class BairroService {
 
     @Transactional
     public List<BairroDto> inserirBairro(InserirBairro dto) {
+
+        if (dto.nome() == null || dto.nome().trim().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "O campo 'nome' é obrigatório e não pode estar vazio.");
+        }
+
         // Valida se o código do município é válido
         Municipio municipio = municipioRepositorio.findById(dto.codigoMunicipio())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Município não encontrado."));
