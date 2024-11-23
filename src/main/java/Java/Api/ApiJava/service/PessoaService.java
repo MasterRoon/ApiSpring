@@ -40,6 +40,9 @@ public class PessoaService {
 
     @Transactional
     public void salvarPessoaComEnderecos(CriarPessoaDto pessoaDto) {
+
+        validarPessoaDto(pessoaDto);
+
         // Cria a entidade Pessoa
         Pessoa pessoa = new Pessoa();
         pessoa.setNome(pessoaDto.nome());
@@ -176,6 +179,50 @@ public class PessoaService {
         pessoa.setStatus(2);
         pessoaRepositorio.save(pessoa);
 
+    }
+
+    public void validarPessoaDto(CriarPessoaDto pessoaDto) {
+        // Validação do nome
+        if (pessoaDto.nome() == null || pessoaDto.nome().trim().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "O campo 'nome' é obrigatório e não pode estar vazio.");
+        }
+
+        // Validação do sobrenome
+        if (pessoaDto.sobrenome() == null || pessoaDto.sobrenome().trim().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "O campo 'sobrenome' é obrigatório e não pode estar vazio.");
+        }
+
+        // Validação da idade
+        if (pessoaDto.idade() == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "O campo 'idade' é obrigatório.");
+        }
+
+        if (pessoaDto.idade() <= 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "O campo 'idade' deve ser maior que zero.");
+        }
+
+        // Validação do login
+        if (pessoaDto.login() == null || pessoaDto.login().trim().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "O campo 'login' é obrigatório e não pode estar vazio.");
+        }
+
+        if (pessoaRepositorio.existsByLogin(pessoaDto.login())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "O login informado já está em uso.");
+        }
+
+        // Validação da senha
+        if (pessoaDto.senha() == null || pessoaDto.senha().trim().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "O campo 'senha' é obrigatório e não pode estar vazio.");
+        }
+
+        if (pessoaDto.senha().length() < 5) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "O campo 'senha' deve ter pelo menos 6 caracteres.");
+        }
+
+        // Validação do endereço
+        if (pessoaDto.enderecos() == null || pessoaDto.enderecos().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "É obrigatório cadastrar ao menos um endereço.");
+        }
     }
 
 }

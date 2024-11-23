@@ -11,6 +11,8 @@ import java.util.Optional;
 
 public interface PessoaRepositorio extends JpaRepository<Pessoa, Long> {
 
+    boolean existsByLogin(String login);
+
     @EntityGraph(attributePaths = {"enderecos", "enderecos.bairro"})
     Optional<Pessoa> findById(Long codigoPessoa);
 
