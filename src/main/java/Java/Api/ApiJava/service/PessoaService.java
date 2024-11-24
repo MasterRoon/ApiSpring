@@ -20,6 +20,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -92,46 +93,45 @@ public class PessoaService {
 
     @Transactional
     public PessoaRespostaCompletaDto buscarPessoaCompleta(Long codigoPessoa) {
-        Pessoa pessoa = pessoaRepositorio.findById(codigoPessoa)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Pessoa não encontrada."));
-
-        // Mapeamento explícito para DTO
-        return new PessoaRespostaCompletaDto(
-                pessoa.getCodigoPessoa(),
-                pessoa.getNome(),
-                pessoa.getSobrenome(),
-                pessoa.getIdade(),
-                pessoa.getLogin(),
-                pessoa.getSenha(),
-                pessoa.getStatus(),
-                pessoa.getEnderecos().stream().map(endereco -> new EnderecoRespostaCompletaDto(
-                        endereco.getCodigoEndereco(),
-                        endereco.getPessoa().getCodigoPessoa(),
-                        endereco.getBairro().getCodigoBairro(),
-                        endereco.getNomeRua(),
-                        String.valueOf(endereco.getNumero()), // Conversão para String
-                        endereco.getComplemento(),
-                        endereco.getCep(),
-                        new BairroRespostaCompletaDto(
+        return pessoaRepositorio.findById(codigoPessoa)
+                .map(pessoa -> new PessoaRespostaCompletaDto(
+                        pessoa.getCodigoPessoa(),
+                        pessoa.getNome(),
+                        pessoa.getSobrenome(),
+                        pessoa.getIdade(),
+                        pessoa.getLogin(),
+                        pessoa.getSenha(),
+                        pessoa.getStatus(),
+                        pessoa.getEnderecos().stream().map(endereco -> new EnderecoRespostaCompletaDto(
+                                endereco.getCodigoEndereco(),
+                                endereco.getPessoa().getCodigoPessoa(),
                                 endereco.getBairro().getCodigoBairro(),
-                                endereco.getBairro().getMunicipio().getCodigoMunicipio(),
-                                endereco.getBairro().getNome(),
-                                endereco.getBairro().getStatus(),
-                                new MunicipioRespostaCompletaDto(
+                                endereco.getNomeRua(),
+                                String.valueOf(endereco.getNumero()), // Conversão para String
+                                endereco.getComplemento(),
+                                endereco.getCep(),
+                                new BairroRespostaCompletaDto(
+                                        endereco.getBairro().getCodigoBairro(),
                                         endereco.getBairro().getMunicipio().getCodigoMunicipio(),
-                                        endereco.getBairro().getMunicipio().getUf().getCodigoUf(),
-                                        endereco.getBairro().getMunicipio().getNome(),
-                                        endereco.getBairro().getMunicipio().getStatus(),
-                                        new UfRespostaDto(
+                                        endereco.getBairro().getNome(),
+                                        endereco.getBairro().getStatus(),
+                                        new MunicipioRespostaCompletaDto(
+                                                endereco.getBairro().getMunicipio().getCodigoMunicipio(),
                                                 endereco.getBairro().getMunicipio().getUf().getCodigoUf(),
-                                                endereco.getBairro().getMunicipio().getUf().getSigla(),
-                                                endereco.getBairro().getMunicipio().getUf().getNome(),
-                                                endereco.getBairro().getMunicipio().getUf().getStatus()
+                                                endereco.getBairro().getMunicipio().getNome(),
+                                                endereco.getBairro().getMunicipio().getStatus(),
+                                                new UfRespostaDto(
+                                                        endereco.getBairro().getMunicipio().getUf().getCodigoUf(),
+                                                        endereco.getBairro().getMunicipio().getUf().getSigla(),
+                                                        endereco.getBairro().getMunicipio().getUf().getNome(),
+                                                        endereco.getBairro().getMunicipio().getUf().getStatus()
+                                                )
                                         )
                                 )
-                        )
-                )).toList()
-        );
+                        )).toList()
+                ))
+                // Se a pessoa não for encontrada, retorna um DTO vazio com endereços como uma lista vazia
+                .orElse(null);
     }
 
     @Transactional

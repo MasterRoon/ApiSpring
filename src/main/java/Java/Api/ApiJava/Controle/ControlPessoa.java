@@ -65,9 +65,14 @@ public class ControlPessoa {
         // Se codigoPessoa for fornecido, retorna uma pessoa com endereços
         if (codigoPessoa != null) {
             PessoaRespostaCompletaDto pessoaDto = pessoaService.buscarPessoaCompleta(codigoPessoa);
+
+            // Retorna um JSON vazio ({}) se a pessoa não for encontrada
+            if (pessoaDto == null) {
+                return ResponseEntity.ok(Collections.emptyMap());
+            }
+
             return ResponseEntity.ok(pessoaDto);
         }
-
 
 
         // Caso contrário, retorna lista de pessoas (sem endereços)
