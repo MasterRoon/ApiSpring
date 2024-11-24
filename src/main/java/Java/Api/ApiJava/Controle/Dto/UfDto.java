@@ -11,6 +11,8 @@ public record UfDto(
         Integer status,
         Instant updateTimestamp
 ) {
+
+
     public UfDto(Uf uf) {
         this(uf.getCodigoUf(), uf.getSigla(), uf.getNome(), uf.getStatus(), uf.getUpdateTimestamp());
     }

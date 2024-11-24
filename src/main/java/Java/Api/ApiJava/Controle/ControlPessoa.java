@@ -3,7 +3,6 @@ package Java.Api.ApiJava.Controle;
 
 import Java.Api.ApiJava.Controle.Dto.AtualizarPessoaDto;
 import Java.Api.ApiJava.Controle.Dto.CriarPessoaDto;
-import Java.Api.ApiJava.Controle.Dto.EnderecoRespostaDto;
 import Java.Api.ApiJava.Controle.Dto.ImpressaoPessoa.PessoaRespostaCompletaDto;
 import Java.Api.ApiJava.Controle.Dto.PessoaRespostaDto;
 import Java.Api.ApiJava.entity.Pessoa;
@@ -89,27 +88,26 @@ public class ControlPessoa {
     }
 
     @PutMapping
-    public ResponseEntity<PessoaRespostaDto> atualizarPessoa(@RequestBody AtualizarPessoaDto pessoaDto) {
-        Pessoa pessoaAtualizada = pessoaService.atualizarPessoaComEnderecos(pessoaDto);
-        PessoaRespostaDto pessoaRespostaDto = new PessoaRespostaDto(
-                pessoaAtualizada.getCodigoPessoa(),
-                pessoaAtualizada.getNome(),
-                pessoaAtualizada.getSobrenome(),
-                pessoaAtualizada.getIdade(),
-                pessoaAtualizada.getLogin(),
-                pessoaAtualizada.getSenha(),
-                pessoaAtualizada.getStatus(),
-                pessoaAtualizada.getEnderecos().stream().map(endereco -> new EnderecoRespostaDto(
-                                endereco.getCodigoEndereco(),
-                                endereco.getBairro().getCodigoBairro(),
-                                endereco.getNomeRua(),
-                                String.valueOf(endereco.getNumero()),
-                                endereco.getComplemento(),
-                                endereco.getCep()))
-                        .collect(Collectors.toList())
-        );
+    public ResponseEntity<List<PessoaRespostaDto>> atualizarPessoa(@RequestBody AtualizarPessoaDto pessoaDto) {
+        // Atualiza a pessoa com os endereços fornecidos
+        pessoaService.atualizarPessoaComEnderecos(pessoaDto);
 
-        return ResponseEntity.ok(pessoaRespostaDto);
+        // Busca todas as pessoas no banco
+        List<PessoaRespostaDto> todasPessoas = pessoaService.buscarTodasPessoas().stream()
+                .map(pessoa -> new PessoaRespostaDto(
+                        pessoa.getCodigoPessoa(),
+                        pessoa.getNome(),
+                        pessoa.getSobrenome(),
+                        pessoa.getIdade(),
+                        pessoa.getLogin(),
+                        pessoa.getSenha(),
+                        pessoa.getStatus(),
+                        Collections.emptyList() // Sempre retorna endereços como lista vazia
+                ))
+                .collect(Collectors.toList());
+
+        // Retorna a lista de pessoas com endereços vazios
+        return ResponseEntity.ok(todasPessoas);
     }
 
     @DeleteMapping

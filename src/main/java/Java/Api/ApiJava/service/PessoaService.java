@@ -207,6 +207,10 @@ public class PessoaService {
         return pessoaRepositorio.save(pessoa);
     }
 
+    public List<Pessoa> buscarTodasPessoas() {
+        return pessoaRepositorio.findAll();
+    }
+
     @Transactional
     public void desativarPessoa(Long codigoPessoa) {
         Pessoa pessoa = pessoaRepositorio.findById(codigoPessoa)

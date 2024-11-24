@@ -62,35 +62,11 @@ public class UfService {
     }
 
     public List<UfDto> buscarUfs(Long codigoUf, String sigla, String nome, Integer status) {
-        List<Uf> ufs;
+        // Busca utilizando os filtros fornecidos
+        var ufs = ufRepositorio.findByFilters(codigoUf, sigla, nome, status);
 
-        if (codigoUf != null) {
-            // Filtrar por código UF
-            ufs = ufRepositorio.findByCodigoUf(codigoUf)
-                    .map(List::of)
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "UF não encontrada."));
-
-        } else if (sigla != null) {
-            // Filtrar por sigla
-            ufs = ufRepositorio.findBySigla(sigla);
-
-        } else if (nome != null) {
-            // Filtrar por nome (parcial, sem case-sensitive)
-            ufs = ufRepositorio.findByNomeContainingIgnoreCase(nome);
-
-        } else if (status != null) {
-            // Filtrar por status
-            ufs = ufRepositorio.findByStatus(status);
-
-        } else {
-            // Retornar todas as UFs se nenhum filtro for fornecido
-            ufs = ufRepositorio.findAll();
-        }
-
-        // Converter para DTO
-        return ufs.stream()
-                .map(UfDto::new)
-                .collect(Collectors.toList());
+        // Converte para DTO
+        return ufs.stream().map(UfDto::new).toList();
     }
 
     public List<UfDto> atualizarUf(AtualizarUf dto) {

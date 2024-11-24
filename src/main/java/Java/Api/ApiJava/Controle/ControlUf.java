@@ -28,15 +28,23 @@ public class ControlUf {
     }
 
     @GetMapping
-    public ResponseEntity<List<UfDto>> buscarUfs(
+    public ResponseEntity<?> buscarUfs(
             @RequestParam(required = false) Long codigoUf,
             @RequestParam(required = false) String sigla,
             @RequestParam(required = false) String nome,
             @RequestParam(required = false) Integer status
     ) {
         var ufs = service.buscarUfs(codigoUf, sigla, nome, status);
+
+        // Se for busca por código e existir exatamente 1 resultado, retorna o objeto diretamente
+        if (codigoUf != null && ufs.size() == 1) {
+            return ResponseEntity.ok(ufs.get(0)); // Retorna o único UF encontrado
+        }
+
+        // Retorna uma lista de UFs ou uma lista vazia
         return ResponseEntity.ok(ufs);
     }
+
 
     @PutMapping
     public ResponseEntity<List<UfDto>> atualizarUf(@RequestBody AtualizarUf dto) {
