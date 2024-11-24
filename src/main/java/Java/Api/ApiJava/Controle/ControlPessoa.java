@@ -4,7 +4,7 @@ package Java.Api.ApiJava.Controle;
 import Java.Api.ApiJava.Controle.Dto.AtualizarPessoaDto;
 import Java.Api.ApiJava.Controle.Dto.CriarPessoaDto;
 import Java.Api.ApiJava.Controle.Dto.EnderecoRespostaDto;
-import Java.Api.ApiJava.Controle.Dto.ImpressãoPessoa.PessoaRespostaCompletaDto;
+import Java.Api.ApiJava.Controle.Dto.ImpressaoPessoa.PessoaRespostaCompletaDto;
 import Java.Api.ApiJava.Controle.Dto.PessoaRespostaDto;
 import Java.Api.ApiJava.entity.Pessoa;
 import Java.Api.ApiJava.service.PessoaService;

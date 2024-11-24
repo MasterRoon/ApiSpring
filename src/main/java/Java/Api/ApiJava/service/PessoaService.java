@@ -5,7 +5,7 @@ package Java.Api.ApiJava.service;
 import Java.Api.ApiJava.Controle.Dto.AtualizarPessoaDto;
 import Java.Api.ApiJava.Controle.Dto.CadrastroEndereco;
 import Java.Api.ApiJava.Controle.Dto.CriarPessoaDto;
-import Java.Api.ApiJava.Controle.Dto.ImpressãoPessoa.*;
+import Java.Api.ApiJava.Controle.Dto.ImpressaoPessoa.*;
 import Java.Api.ApiJava.Repositorio.BairroRepositorio;
 import Java.Api.ApiJava.Repositorio.EnderecoRepositorio;
 import Java.Api.ApiJava.Repositorio.PessoaRepositorio;
