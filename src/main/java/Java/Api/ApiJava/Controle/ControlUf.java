@@ -56,8 +56,11 @@ public class ControlUf {
     }
 
     @DeleteMapping
-    public ResponseEntity<List<UfDto>> deletarUf(@RequestBody Long codigoUf) {
+    public ResponseEntity<List<UfDto>> deletarUf(@RequestBody UfDto ufDeleteRequestDto) {
+        // Obtém o código da UF do DTO
+        Long codigoUf = ufDeleteRequestDto.codigoUf();
 
+        // Chama o serviço para deletar a UF
         List<UfDto> ufsAtualizadas = service.deletarUf(codigoUf);
 
         // Retorna todos os registros da tabela após a operação
