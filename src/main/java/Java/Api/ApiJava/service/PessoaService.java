@@ -20,7 +20,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -45,6 +44,7 @@ public class PessoaService {
 
         validarPessoaDto(pessoaDto);
 
+
         // Cria a entidade Pessoa
         Pessoa pessoa = new Pessoa();
         pessoa.setNome(pessoaDto.nome());
@@ -58,6 +58,8 @@ public class PessoaService {
         List<Endereco> enderecos = pessoaDto.enderecos().stream().map(enderecoDto -> {
             Bairro bairro = bairroRepositorio.findById(enderecoDto.codigoBairro())
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Bairro não encontrado"));
+
+            validarEndereco(enderecoDto);
 
             Endereco endereco = new Endereco();
             endereco.setPessoa(pessoa);
@@ -138,10 +140,13 @@ public class PessoaService {
     public Pessoa atualizarPessoaComEnderecos(AtualizarPessoaDto pessoaDto) {
 
 
+        if (pessoaDto.status() == null || (pessoaDto.status() != 1 && pessoaDto.status() != 2)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "O campo 'status' deve ser 1 (ativo) ou 2 (desativado).");
+        }
+
         // Busca a pessoa existente
         Pessoa pessoa = pessoaRepositorio.findById(pessoaDto.codigoPessoa())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Pessoa não encontrada"));
-
 
         // Atualiza os campos da Pessoa
         pessoa.setNome(pessoaDto.nome());
@@ -216,6 +221,10 @@ public class PessoaService {
         Pessoa pessoa = pessoaRepositorio.findById(codigoPessoa)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Pessoa não encontrada"));
 
+        if (codigoPessoa <= 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "O código da pessoa deve ser um número positivo.");
+        }
+
         if (pessoa.getStatus() == 2) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "A pessoa já está desativada.");
         }
@@ -260,12 +269,30 @@ public class PessoaService {
         }
 
         if (pessoaDto.senha().length() < 5) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "O campo 'senha' deve ter pelo menos 6 caracteres.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "O campo 'senha' deve ter pelo menos 5 caracteres.");
+        }
+
+        if (!pessoaDto.login().matches("^[a-zA-Z0-9._-]+$")) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "O campo 'login' contém caracteres inválidos. Apenas letras, números, '.', '-' e '_' são permitidos.");
         }
 
         // Validação do endereço
         if (pessoaDto.enderecos() == null || pessoaDto.enderecos().isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "É obrigatório cadastrar ao menos um endereço.");
+        }
+    }
+
+    public void validarEndereco(CadrastroEndereco enderecoDto){
+        if (enderecoDto.nomeRua() == null || enderecoDto.nomeRua().trim().isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "O campo 'nomeRua' é obrigatório e não pode estar vazio.");
+        }
+
+        if (enderecoDto.numero() == null || !enderecoDto.numero().matches("\\d+")) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "O campo 'numero' é obrigatório e deve conter apenas números.");
+        }
+
+        if (enderecoDto.cep() == null || !enderecoDto.cep().matches("\\d{5}-\\d{3}")) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "O campo 'cep' é obrigatório e deve seguir o formato XXXXX-XXX.");
         }
     }
 
