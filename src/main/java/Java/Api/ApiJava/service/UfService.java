@@ -30,8 +30,15 @@ public class UfService {
         boolean siglaExistente = ufRepositorio.existsBySigla(inserirUf.sigla());
         boolean nomeExistente = ufRepositorio.existsByNome(inserirUf.nome());
 
+        if (inserirUf.status() != null && !List.of(1, 2).contains(inserirUf.status())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "O status deve ser 1 (ativo) ou 2 (inativo).");
+        }
 
-        if (inserirUf.sigla() == null || inserirUf.sigla().trim().isEmpty()) {
+        if (!inserirUf.sigla().matches("^[A-Z]{2}$")) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "A sigla deve conter exatamente dois caracteres em maiúsculo (ex: 'SP').");
+        }
+
+        if (inserirUf.sigla().trim().isEmpty()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "O campo 'Sigla' é obrigatório e não pode estar vazio.");
         }
 
@@ -59,6 +66,8 @@ public class UfService {
     }
 
     public List<UfDto> buscarUfs(Long codigoUf, String sigla, String nome, Integer status) {
+
+
         // Busca utilizando os filtros fornecidos
         var ufs = ufRepositorio.findByFilters(codigoUf, sigla, nome, status);
 
@@ -83,6 +92,11 @@ public class UfService {
         if (dto.status() == null ) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "O Status é obrigatório para a atualização.");
         }
+
+        if (!List.of(1, 2).contains(dto.status())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "O status deve ser 1 (ativo) ou 2 (inativo).");
+        }
+
 
         // Busca a UF pelo código
         Uf uf = ufRepositorio.findById(dto.codigoUf())
