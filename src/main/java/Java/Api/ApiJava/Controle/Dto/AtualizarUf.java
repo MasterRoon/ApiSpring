@@ -1,4 +1,6 @@
 package Java.Api.ApiJava.Controle.Dto;
 
-public record AtualizarUf(Long codigoUf,String sigla,String nome,Integer status) {
+import com.fasterxml.jackson.annotation.JsonAlias;
+
+public record AtualizarUf(@JsonAlias({"codigoUf", "codigoUF"})Long codigoUf, String sigla, String nome, Integer status) {
 }

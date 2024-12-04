@@ -35,10 +35,16 @@ public class ControlMunicio {
     @GetMapping
     public ResponseEntity<?> buscarMunicipios(
             @RequestParam(required = false) Long codigoMunicipio,
-            @RequestParam(required = false) Long codigoUf,
+            @RequestParam(name = "codigoUf", required = false) Long codigoUf, // Para "codigoUf"
+            @RequestParam(name = "codigoUF", required = false) Long codigoUF,
             @RequestParam(required = false) String nome,
             @RequestParam(required = false) Integer status
     ) {
+
+        if (codigoUF != null) {
+            codigoUf = codigoUF;
+        }
+
         var municipios = municipioService.buscarMunicipios(codigoMunicipio, codigoUf, nome, status);
 
         if (codigoMunicipio != null && municipios.size() == 1) {
